@@ -1,0 +1,13 @@
+node_modules/
+.git/
+README.md
+dist/
+.gitlab-ci.yml
+npm-debug.log
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+.env.template
+.github/
+volumes/
+data
