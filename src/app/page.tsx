@@ -6,9 +6,10 @@ import { BottomNavigation, BottomNavigationAction, Box } from "@mui/material";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import DailyBook from "@/components/DailyBook";
 
 import styles from "./page.module.css";
-import DailyBook from "@/components/DailyBook";
 
 export default function Home() {
   const [page, setPage] = useState(0);
@@ -20,7 +21,9 @@ export default function Home() {
         flexDirection="column"
         sx={{ width: "100%", height: "100vh" }}
       >
-        <div style={{ flex: "1" }}>{page == 0 && <DailyBook />}</div>
+        <div style={{ flex: "1", padding: 25 }}>
+          {page == 0 && <DailyBook />}
+        </div>
         <BottomNavigation
           showLabels
           value={page}
@@ -36,6 +39,11 @@ export default function Home() {
             label="Balance de comprobación"
             icon={<AccountBalanceWalletIcon />}
           />
+          <BottomNavigationAction
+            label="Estados financieros"
+            icon={<AttachMoneyIcon />}
+          />
+
           <BottomNavigationAction label="Kardex" icon={<CreditCardIcon />} />
         </BottomNavigation>
       </Box>
