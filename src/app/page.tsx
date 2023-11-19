@@ -10,6 +10,9 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DailyBook from "@/components/DailyBook";
 
 import styles from "./page.module.css";
+import Balance from "@/components/Balance";
+import Kardex from "@/components/Kardex";
+import Financiero from "@/components/Financiero";
 
 export default function Home() {
   const [page, setPage] = useState(0);
@@ -23,6 +26,9 @@ export default function Home() {
       >
         <div style={{ flex: "1", padding: 25 }}>
           {page == 0 && <DailyBook />}
+          {page == 1 && <Balance />}
+          {page == 2 && <Financiero />}
+          {page == 3 && <Kardex />}
         </div>
         <BottomNavigation
           showLabels
