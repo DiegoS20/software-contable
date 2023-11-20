@@ -7,8 +7,6 @@ export const dynamic = "force-dynamic";
 export const POST = async (req: Request) => {
   const { DetalleAsiento, ...asiento } = (await req.json()) as Asiento;
 
-  console.log(DetalleAsiento);
-
   await prisma.asientos.create({
     data: {
       ...asiento,

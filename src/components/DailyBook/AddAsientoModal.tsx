@@ -80,7 +80,6 @@ export default function AddAsientoModal({ open, onClose }: Props) {
       haber += +(f.haber || 0);
       debe += +(f.debe || 0);
     });
-    console.log(debe, haber);
     if (haber != debe) {
       alert("El debe y el haber deben igualarse en cantidad");
       return;
