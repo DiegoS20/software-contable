@@ -21,7 +21,7 @@ model Conceptos {
   id_concepto    Int              @id @default(autoincrement())
   code           String           @db.VarChar(100)
   name           String           @db.VarChar(255)
-  categoria      Categorias       @relation(fields: [code_categoria], references: [code])
+  categoria      Categorias       @relation(fields: [code_categoria], references: [code], onDelete: Cascade)
   code_categoria String
   DetalleAsiento DetalleAsiento[]
 }
@@ -38,8 +38,8 @@ model DetalleAsiento {
   id_detalle_asiento Int       @id @default(autoincrement())
   debe               Decimal?  @default(0) @db.Decimal(10, 2)
   haber              Decimal?  @default(0) @db.Decimal(10, 2)
-  asiento            Asientos  @relation(fields: [id_asiento], references: [id_asiento])
+  asiento            Asientos  @relation(fields: [id_asiento], references: [id_asiento], onDelete: Cascade)
   id_asiento         Int
-  concepto           Conceptos @relation(fields: [id_concepto], references: [id_concepto])
+  concepto           Conceptos @relation(fields: [id_concepto], references: [id_concepto], onDelete: Cascade)
   id_concepto        Int
 }
