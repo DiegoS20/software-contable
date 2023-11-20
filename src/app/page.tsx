@@ -8,7 +8,6 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DailyBook from "@/components/DailyBook";
-
 import styles from "./page.module.css";
 import Balance from "@/components/Balance";
 import Kardex from "@/components/Kardex";
