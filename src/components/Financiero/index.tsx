@@ -152,13 +152,17 @@ const Financiero = () => {
                     </TableRow>
                   );
                 })}
+                <TableRow>
+                  <TableCell>UTILIDAD OPERACIONAL</TableCell>
+                  <TableCell align="right">{utilidadOperacional}</TableCell>
+                </TableRow>
 
                 <TableRow>
                   <TableCell style={{ fontWeight: "bold" }}>
                     Total Pasivos y Capital
                   </TableCell>
                   <TableCell align="right">
-                    ${totalCapital + totalPasivos}
+                    ${totalCapital + totalPasivos + utilidadOperacional}
                   </TableCell>
                 </TableRow>
               </TableBody>
