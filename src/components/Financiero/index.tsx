@@ -18,7 +18,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const financiero = () => {
+const Financiero = () => {
   const { estadosFinancieros } = useEstadosFinancieros();
   const inventarioFinal = usePrecios((state) => state.inventarioFinal);
 
@@ -195,4 +195,4 @@ const financiero = () => {
   );
 };
 
-export default financiero;
+export default Financiero;

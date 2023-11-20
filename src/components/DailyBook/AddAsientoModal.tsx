@@ -221,8 +221,8 @@ export default function AddAsientoModal({ open, onClose }: Props) {
                           );
                         }}
                       >
-                        {conceptos?.map((c) => [
-                          <ListSubheader>{c.name}</ListSubheader>,
+                        {conceptos?.map((c, i) => [
+                          <ListSubheader key={i}>{c.name}</ListSubheader>,
                           c.Conceptos.map((cl) => (
                             <MenuItem
                               key={cl.code}

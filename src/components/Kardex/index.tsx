@@ -30,7 +30,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function kardex() {
+export default function Kardex() {
   const { kardex } = useKardex();
   const precioVenta = usePrecios((state) => state.precioVenta);
   const costoVenta = usePrecios((state) => state.costoVenta);
