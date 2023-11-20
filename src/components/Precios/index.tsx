@@ -8,6 +8,15 @@ export default function Precios() {
   return (
     <Grid container spacing={2} style={{ padding: 25 }}>
       <Grid item xs={12}>
+        <h1
+          style={{
+            marginBottom: 25,
+          }}
+        >
+          Software contable para Hikaru - venta de motos
+        </h1>
+      </Grid>
+      <Grid item xs={12}>
         <TextField
           type="number"
           style={{ width: "25%" }}
