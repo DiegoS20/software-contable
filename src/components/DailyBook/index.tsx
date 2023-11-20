@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import { Fragment, useState } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -7,25 +9,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/system";
-
-function createData(
-  code: string,
-  date: string,
-  concept: string,
-  debit: number,
-  credit: number
-) {
-  return { code, date, concept, debit, credit };
-}
-
-const rows = [
-  createData("001", "2023-01-01", "Sales", 1000, 0),
-  createData("002", "2023-01-02", "Purchase", 0, 800),
-  createData("003", "2023-01-02", "Purc", 0, 200),
-  // Add more rows as needed
-];
+import { Button } from "@mui/material";
+import AddAsientoModal from "./AddAsientoModal";
+import useAsientos from "@/hooks/useAsientos";
 
 const DailyBook = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const { asientos } = useAsientos();
+
   const BoldTableCell = styled(TableCell)({
     fontWeight: "bold",
     backgroundColor: "#90caf9",
@@ -35,12 +26,20 @@ const DailyBook = () => {
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
         Libro diario
       </h2>
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => setOpenModal(true)}
+        sx={{ marginBottom: "25px" }}
+      >
+        Agregar Asiento
+      </Button>
       <TableContainer component={Paper} sx={{ background: "#f0f0f0" }}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
           <TableHead sx={{ background: "#42a5f5" }}>
             <TableRow>
-              <BoldTableCell>Codigo</BoldTableCell>
-              <BoldTableCell align="right">Fecha</BoldTableCell>
+              <BoldTableCell align="center">Fecha</BoldTableCell>
+              <BoldTableCell align="center">Codigo</BoldTableCell>
               <BoldTableCell align="center" width="40%">
                 Concepto
               </BoldTableCell>
@@ -53,29 +52,58 @@ const DailyBook = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.code}>
-                <TableCell component="th" scope="row">
-                  {row.code}
-                </TableCell>
-                <TableCell align="right">{row.date}</TableCell>
-                <TableCell align="center">{row.concept}</TableCell>
-                <TableCell align="center" width="20%">
-                  {row.debit}
-                </TableCell>
-                <TableCell align="center" width="20%">
-                  {row.credit}
-                </TableCell>
-              </TableRow>
-            ))}
-            <TableRow>
-              <TableCell colSpan={3}>total</TableCell>
-              <TableCell align="center">1000</TableCell>
-              <TableCell align="center">1000</TableCell>
-            </TableRow>
+            {asientos?.map((a) => {
+              let totalDebe = 0;
+              let totalHaber = 0;
+              return (
+                <Fragment key={a.id_asiento}>
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      align="center"
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 25,
+                      }}
+                    >
+                      Asiento {a.name}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell rowSpan={a.DetalleAsiento!.length + 1}>
+                      {new Date(a.date).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                  {a.DetalleAsiento?.map((da, i) => {
+                    totalDebe += +(da.debe || 0);
+                    totalHaber += +(da.haber || 0);
+                    return (
+                      <TableRow key={i}>
+                        <TableCell>{da.concepto.code}</TableCell>
+                        <TableCell>{da.concepto.name}</TableCell>
+                        <TableCell>${da.debe || 0}</TableCell>
+                        <TableCell>${da.haber || 0}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  <TableRow>
+                    <TableCell colSpan={3} style={{ fontStyle: "italic" }}>
+                      c/ {a.comment}
+                    </TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>
+                      ${totalDebe}
+                    </TableCell>
+                    <TableCell style={{ fontWeight: "bold" }}>
+                      ${totalHaber}
+                    </TableCell>
+                  </TableRow>
+                </Fragment>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
+      <AddAsientoModal open={openModal} onClose={() => setOpenModal(false)} />
     </div>
   );
 };
