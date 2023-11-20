@@ -12,6 +12,7 @@ datasource db {
 
 model Categorias {
   id_categoria Int         @id @default(autoincrement())
+  code         String      @unique @db.VarChar(100)
   name         String      @db.VarChar(255)
   Conceptos    Conceptos[]
 }
@@ -20,8 +21,8 @@ model Conceptos {
   id_concepto    Int              @id @default(autoincrement())
   code           String           @db.VarChar(100)
   name           String           @db.VarChar(255)
-  categoria      Categorias       @relation(fields: [id_categoria], references: [id_categoria])
-  id_categoria   Int
+  categoria      Categorias       @relation(fields: [code_categoria], references: [code])
+  code_categoria String
   DetalleAsiento DetalleAsiento[]
 }
 

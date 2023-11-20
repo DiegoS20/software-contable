@@ -12,6 +12,7 @@ import styles from "./page.module.css";
 import Balance from "@/components/Balance";
 import Kardex from "@/components/Kardex";
 import Financiero from "@/components/Financiero";
+import Precios from "@/components/Precios";
 
 export default function Home() {
   const [page, setPage] = useState(0);
@@ -23,6 +24,7 @@ export default function Home() {
         flexDirection="column"
         sx={{ width: "100%", height: "100vh" }}
       >
+        <Precios />
         <div style={{ flex: "1", padding: 25 }}>
           {page == 0 && <DailyBook />}
           {page == 1 && <Balance />}

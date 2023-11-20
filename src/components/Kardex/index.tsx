@@ -1,4 +1,3 @@
-import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,6 +6,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import useKardex from "@/hooks/useKardex";
+import usePrecios from "@/hooks/usePrecios";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -29,25 +30,42 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
 export default function kardex() {
+  const { kardex } = useKardex();
+  const precioVenta = usePrecios((state) => state.precioVenta);
+  const costoVenta = usePrecios((state) => state.costoVenta);
+  const setInventarioFinal = usePrecios((state) => state.setInventarioFinal);
+
+  let existencias = 0,
+    saldoTotal = 0;
+
+  const rows = kardex?.map((row, i) => {
+    const divider = row.concepto == "VENTAS" ? precioVenta : costoVenta;
+    const entrada = +row.debe / divider;
+    const salida = +row.haber / divider;
+    existencias += entrada - salida;
+    saldoTotal += +row.debe - +row.haber;
+
+    return (
+      <StyledTableRow key={i}>
+        <StyledTableCell component="th" scope="row">
+          {new Date(row.fecha).toLocaleDateString()}
+        </StyledTableCell>
+        <StyledTableCell align="left">{row.concepto}</StyledTableCell>
+        <StyledTableCell align="center">{entrada.toFixed(0)}</StyledTableCell>
+        <StyledTableCell align="center">{salida.toFixed(0)}</StyledTableCell>
+        <StyledTableCell align="center">
+          {existencias.toFixed(0)}
+        </StyledTableCell>
+        <StyledTableCell align="center">${costoVenta}</StyledTableCell>
+        <StyledTableCell align="center">${row.debe}</StyledTableCell>
+        <StyledTableCell align="center">${row.haber}</StyledTableCell>
+        <StyledTableCell align="center">${saldoTotal}</StyledTableCell>
+      </StyledTableRow>
+    );
+  });
+
+  setInventarioFinal(saldoTotal);
   return (
     <div>
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Kardex</h2>
@@ -66,23 +84,7 @@ export default function kardex() {
               <StyledTableCell align="right">Saldo</StyledTableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow key={row.name}>
-                <StyledTableCell component="th" scope="row">
-                  {row.calories}
-                </StyledTableCell>
-                <StyledTableCell align="left">{row.name}</StyledTableCell>
-                <StyledTableCell align="center">{row.fat}</StyledTableCell>
-                <StyledTableCell align="center">{row.carbs}</StyledTableCell>
-                <StyledTableCell align="center">{row.protein}</StyledTableCell>
-                <StyledTableCell align="center">{row.calories}</StyledTableCell>
-                <StyledTableCell align="center">{row.fat}</StyledTableCell>
-                <StyledTableCell align="center">{row.carbs}</StyledTableCell>
-                <StyledTableCell align="center">{row.protein}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
+          <TableBody>{rows}</TableBody>
         </Table>
       </TableContainer>
     </div>

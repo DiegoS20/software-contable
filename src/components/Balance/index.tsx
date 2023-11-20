@@ -1,4 +1,3 @@
-import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,6 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import useBalanceComprobacion from "@/hooks/useBalanceComprobacion";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -29,25 +29,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
 export default function Balance() {
+  const { balanceComprobacion } = useBalanceComprobacion();
+
   return (
     <div>
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
@@ -74,16 +58,20 @@ export default function Balance() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow key={row.name}>
+            {balanceComprobacion?.balances.map((row) => (
+              <StyledTableRow key={row.codigo}>
                 <StyledTableCell component="th" scope="row">
-                  {row.calories}
+                  {row.codigo}
                 </StyledTableCell>
-                <StyledTableCell align="left">{row.name}</StyledTableCell>
-                <StyledTableCell align="center">{row.fat}</StyledTableCell>
-                <StyledTableCell align="center">{row.carbs}</StyledTableCell>
-                <StyledTableCell align="center">{row.protein}</StyledTableCell>
-                <StyledTableCell align="center">{row.calories}</StyledTableCell>
+                <StyledTableCell align="left">{row.concepto}</StyledTableCell>
+                <StyledTableCell align="center">${row.debe}</StyledTableCell>
+                <StyledTableCell align="center">${row.haber}</StyledTableCell>
+                <StyledTableCell align="center">
+                  ${row.saldo_deudor}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  ${row.saldo_acreedor}
+                </StyledTableCell>
               </StyledTableRow>
             ))}
             <StyledTableRow>
@@ -95,16 +83,16 @@ export default function Balance() {
                 Total
               </StyledTableCell>
               <StyledTableCell align="center" style={{ fontWeight: "bold" }}>
-                1000
+                ${balanceComprobacion?.totals.total_debe}
               </StyledTableCell>
               <StyledTableCell align="center" style={{ fontWeight: "bold" }}>
-                1000
+                ${balanceComprobacion?.totals.total_haber}
               </StyledTableCell>
               <StyledTableCell align="center" style={{ fontWeight: "bold" }}>
-                1000
+                ${balanceComprobacion?.totals.total_deudor}
               </StyledTableCell>
               <StyledTableCell align="center" style={{ fontWeight: "bold" }}>
-                1000
+                ${balanceComprobacion?.totals.total_acreedor}
               </StyledTableCell>
             </StyledTableRow>
           </TableBody>

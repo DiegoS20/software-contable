@@ -8,6 +8,8 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import useEstadosFinancieros from "@/hooks/useEstadosFinancieros";
+import usePrecios from "@/hooks/usePrecios";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${theme.palette.mode === "light" ? "head" : "body"}`]: {
@@ -16,39 +18,65 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const assetsData = [
-  { account: "Caja", value: 10000 },
-  { account: "Cuentas por Cobrar", value: 5000 },
-  { account: "Cuentas por Cobrar", value: 1000 },
-  { account: "Cuentas por Cobrar", value: 2000 },
-];
-
-const liabilitiesData = [
-  { account: "Préstamo", value: 3000 },
-  { account: "Capital", value: 12000 },
-];
-const data = [
-  { cuenta: "ventas", valor: "" },
-  { cuenta: "(-) Desc/ventas", valor: "" },
-  { cuenta: "(=) ventas netas", valor: "" },
-  { cuenta: "compras", valor: "" },
-  { cuenta: "(+) gastos de compra", valor: "" },
-  { cuenta: "(=) compras totales", valor: "" },
-  { cuenta: "(-) descuent/compra", valor: "" },
-  { cuenta: "(=) compras netas", valor: "" },
-  { cuenta: "(+) inventario inicial", valor: "" },
-  { cuenta: "(=) mercancia disponible", valor: "" },
-  { cuenta: "(-) inventario final", valor: "" },
-  { cuenta: "(=) costo de venta", valor: "" },
-  { cuenta: "(=) utilidad bruta", valor: "5000" },
-  { cuenta: "(-) gastos de operación", valor: "3000" },
-  { cuenta: "venta", valor: "" },
-  { cuenta: "adminis", valor: "" },
-  { cuenta: "financiero", valor: "" },
-  { cuenta: "(=) utilidad operacional", valor: "" },
-];
-
 const financiero = () => {
+  const { estadosFinancieros } = useEstadosFinancieros();
+  const inventarioFinal = usePrecios((state) => state.inventarioFinal);
+
+  const estadoDeResultado = estadosFinancieros?.estadoDeResultado;
+  const balanceGeneral = estadosFinancieros?.balanceGeneral;
+
+  if (!estadoDeResultado || !balanceGeneral) return;
+
+  const ventas = +estadoDeResultado["5101"] || 0;
+  const descVentas = +estadoDeResultado["4204"] || 0;
+  const gastoCompra = +estadoDeResultado["4102"] || 0;
+  const descuentoCompra = +estadoDeResultado["5103"] || 0;
+  const invetarioInicial = +estadoDeResultado["1109"] || 0;
+  const gastosOperacion =
+    (+estadoDeResultado["4201"] || 0) +
+    (+estadoDeResultado["4202"] || 0) +
+    (+estadoDeResultado["4203"] || 0);
+
+  const ventasNetas = ventas - descVentas,
+    comprasTotales = ventasNetas + gastoCompra,
+    comprasNetas = comprasTotales - descuentoCompra,
+    mercanciaDisponible = comprasNetas + invetarioInicial,
+    costoVenta = mercanciaDisponible - inventarioFinal,
+    utilidadBruta = ventasNetas - costoVenta,
+    utilidadOperacional = utilidadBruta - gastosOperacion;
+
+  const data = [
+    { cuenta: "ventas", valor: ventas },
+    { cuenta: "(-) Desc/ventas", valor: descVentas },
+    { cuenta: "(=) ventas netas", valor: ventas - descVentas },
+    { cuenta: "compras", valor: "" },
+    { cuenta: "(+) gastos de compra", valor: gastoCompra },
+    { cuenta: "(=) compras totales", valor: ventas - descVentas + gastoCompra },
+    { cuenta: "(-) descuent/compra", valor: descuentoCompra },
+    { cuenta: "(=) compras netas", valor: comprasNetas },
+    { cuenta: "(+) inventario inicial", valor: invetarioInicial },
+    { cuenta: "(=) mercancia disponible", valor: mercanciaDisponible },
+    { cuenta: "(-) inventario final", valor: inventarioFinal },
+    { cuenta: "(=) costo de venta", valor: costoVenta },
+    { cuenta: "(=) utilidad bruta", valor: utilidadBruta },
+    { cuenta: "(-) gastos de operación", valor: gastosOperacion },
+    { cuenta: "(=) utilidad operacional", valor: utilidadOperacional },
+  ];
+
+  const cuentas = Object.entries(balanceGeneral);
+  const activos = cuentas.filter(
+    (c) => balanceGeneral[c[0]].code_categoria == "1"
+  );
+  const pasivos = cuentas.filter(
+    (c) => balanceGeneral[c[0]].code_categoria == "2"
+  );
+  const capital = cuentas.filter(
+    (c) => balanceGeneral[c[0]].code_categoria == "3"
+  );
+
+  let totalActivos = 0,
+    totalPasivos = 0,
+    totalCapital = 0;
   return (
     <div
       style={{ textAlign: "center", paddingLeft: "50px", paddingRight: "50px" }}
@@ -72,18 +100,21 @@ const financiero = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {assetsData.map((row) => (
-                  <TableRow key={row.account}>
-                    <TableCell>{row.account}</TableCell>
-                    <TableCell align="right">{row.value}</TableCell>
-                  </TableRow>
-                ))}
+                {activos.map((row, i) => {
+                  totalActivos += +row[1].saldo || 0;
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>{row[0]}</TableCell>
+                      <TableCell align="right">{row[1].saldo}</TableCell>
+                    </TableRow>
+                  );
+                })}
 
                 <TableRow>
                   <TableCell style={{ fontWeight: "bold" }}>
                     Total Activos
                   </TableCell>
-                  <TableCell align="right">18000</TableCell>
+                  <TableCell align="right">${totalActivos}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -103,18 +134,32 @@ const financiero = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {liabilitiesData.map((row) => (
-                  <TableRow key={row.account}>
-                    <TableCell>{row.account}</TableCell>
-                    <TableCell align="right">{row.value}</TableCell>
-                  </TableRow>
-                ))}
+                {pasivos.map((row, i) => {
+                  totalPasivos += +row[1].saldo || 0;
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>{row[0]}</TableCell>
+                      <TableCell align="right">${row[1].saldo}</TableCell>
+                    </TableRow>
+                  );
+                })}
+                {capital.map((row, i) => {
+                  totalCapital += +row[1].saldo || 0;
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>{row[0]}</TableCell>
+                      <TableCell align="right">${row[1].saldo}</TableCell>
+                    </TableRow>
+                  );
+                })}
 
                 <TableRow>
                   <TableCell style={{ fontWeight: "bold" }}>
                     Total Pasivos y Capital
                   </TableCell>
-                  <TableCell align="right">18000</TableCell>
+                  <TableCell align="right">
+                    ${totalCapital + totalPasivos}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -140,7 +185,7 @@ const financiero = () => {
                 <StyledTableCell component="th" scope="row">
                   {row.cuenta}
                 </StyledTableCell>
-                <StyledTableCell align="right">{row.valor}</StyledTableCell>
+                <StyledTableCell align="right">${row.valor}</StyledTableCell>
               </TableRow>
             ))}
           </TableBody>

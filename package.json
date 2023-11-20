@@ -26,7 +26,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
-    "sharp": "^0.32.6"
+    "sharp": "^0.32.6",
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@types/node": "^20",
