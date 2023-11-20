@@ -30,6 +30,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const cuentas = ["DEVOLUCIONES SOBRE VENTAS", "VENTAS"];
+
 export default function Kardex() {
   const { kardex } = useKardex();
   const precioVenta = usePrecios((state) => state.precioVenta);
@@ -40,7 +42,8 @@ export default function Kardex() {
     saldoTotal = 0;
 
   const rows = kardex?.map((row, i) => {
-    const divider = row.concepto == "VENTAS" ? precioVenta : costoVenta;
+    const divider =
+      cuentas.indexOf(row.concepto) > 0 ? precioVenta : costoVenta;
     const entrada = +row.debe / divider;
     const salida = +row.haber / divider;
     existencias += entrada - salida;
