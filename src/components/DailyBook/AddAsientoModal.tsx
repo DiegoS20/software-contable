@@ -74,6 +74,17 @@ export default function AddAsientoModal({ open, onClose }: Props) {
   });
 
   const handleAsientoFormSubmit: SubmitHandler<Asiento> = async (data) => {
+    let haber = 0,
+      debe = 0;
+    fields.forEach((f) => {
+      haber += +(f.haber || 0);
+      debe += +(f.debe || 0);
+    });
+    console.log(debe, haber);
+    if (haber != debe) {
+      alert("El debe y el haber deben igualarse en cantidad");
+      return;
+    }
     await createAsiento(data);
     resetDetalleAsiento();
     resetAsiento();
