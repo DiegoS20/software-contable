@@ -44,10 +44,12 @@ export default function Kardex() {
   const rows = kardex?.map((row, i) => {
     const divider =
       cuentas.indexOf(row.concepto) > 0 ? precioVenta : costoVenta;
-    const entrada = +row.debe / divider;
-    const salida = +row.haber / divider;
-    existencias += entrada - salida;
-    saldoTotal += +row.debe - +row.haber;
+    const entradaUnidades = +row.debe / divider;
+    const salidaUnidades = +row.haber / divider;
+    const debe = entradaUnidades * costoVenta;
+    const haber = salidaUnidades * costoVenta;
+    existencias += +entradaUnidades - +salidaUnidades;
+    saldoTotal += debe - haber;
 
     return (
       <StyledTableRow key={i}>
@@ -55,14 +57,18 @@ export default function Kardex() {
           {new Date(row.fecha).toLocaleDateString()}
         </StyledTableCell>
         <StyledTableCell align="left">{row.concepto}</StyledTableCell>
-        <StyledTableCell align="center">{entrada.toFixed(0)}</StyledTableCell>
-        <StyledTableCell align="center">{salida.toFixed(0)}</StyledTableCell>
+        <StyledTableCell align="center">
+          {entradaUnidades.toFixed(0)}
+        </StyledTableCell>
+        <StyledTableCell align="center">
+          {salidaUnidades.toFixed(0)}
+        </StyledTableCell>
         <StyledTableCell align="center">
           {existencias.toFixed(0)}
         </StyledTableCell>
         <StyledTableCell align="center">${costoVenta}</StyledTableCell>
-        <StyledTableCell align="center">${row.debe}</StyledTableCell>
-        <StyledTableCell align="center">${row.haber}</StyledTableCell>
+        <StyledTableCell align="center">${debe}</StyledTableCell>
+        <StyledTableCell align="center">${haber}</StyledTableCell>
         <StyledTableCell align="center">${saldoTotal}</StyledTableCell>
       </StyledTableRow>
     );

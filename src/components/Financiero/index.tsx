@@ -28,6 +28,7 @@ const Financiero = () => {
   if (!estadoDeResultado || !balanceGeneral) return;
 
   const ventas = +estadoDeResultado["5101"] || 0;
+  const compras = +estadoDeResultado["4101"] || 0;
   const descVentas = +estadoDeResultado["4204"] || 0;
   const gastoCompra = +estadoDeResultado["4102"] || 0;
   const descuentoCompra = +estadoDeResultado["5103"] || 0;
@@ -38,7 +39,7 @@ const Financiero = () => {
     (+estadoDeResultado["4203"] || 0);
 
   const ventasNetas = ventas - descVentas,
-    comprasTotales = ventasNetas + gastoCompra,
+    comprasTotales = ventasNetas - compras + gastoCompra,
     comprasNetas = comprasTotales - descuentoCompra,
     mercanciaDisponible = comprasNetas + invetarioInicial,
     costoVenta = mercanciaDisponible - inventarioFinal,
@@ -48,10 +49,10 @@ const Financiero = () => {
   const data = [
     { cuenta: "ventas", valor: ventas },
     { cuenta: "(-) Desc/ventas", valor: descVentas },
-    { cuenta: "(=) ventas netas", valor: ventas - descVentas },
-    { cuenta: "compras", valor: "" },
+    { cuenta: "(=) ventas netas", valor: ventasNetas },
+    { cuenta: "(-) compras", valor: compras },
     { cuenta: "(+) gastos de compra", valor: gastoCompra },
-    { cuenta: "(=) compras totales", valor: ventas - descVentas + gastoCompra },
+    { cuenta: "(=) compras totales", valor: comprasTotales },
     { cuenta: "(-) descuent/compra", valor: descuentoCompra },
     { cuenta: "(=) compras netas", valor: comprasNetas },
     { cuenta: "(+) inventario inicial", valor: invetarioInicial },
@@ -174,7 +175,7 @@ const Financiero = () => {
       <h2>Estado de resultado</h2>
       <TableContainer
         component={Paper}
-        sx={{ maxWidth: 400, margin: "auto", marginTop: 20 }}
+        sx={{ maxWidth: 400, margin: "auto", marginTop: 5 }}
       >
         <Table sx={{ minWidth: 300 }} aria-label="customized table">
           <TableHead>
